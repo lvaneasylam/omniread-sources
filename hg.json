@@ -1,0 +1,46 @@
+{
+  "bookSourceName": "红果短剧",
+  "bookSourceUrl": "https://hongguoduanju.com/",
+  "bookSourceType": 0,
+  "omnireadMediaType": "video",
+  "bookSourceVersion": "1.0.0",
+  "bookSourceGroup": "短剧",
+  "bookSourceComment": "红果短剧官方站（hongguoduanju.com）网页版接入。由 hipy 脚本《红果修复.py》迁移。发现/搜索/详情/目录完整可用；播放仅支持免费集公开 360p 直链（目录只显示 accessible_episode_cnt 标记的免费集）。付费集与高清线路需番茄签名 API + CENC 解密流，超出云书阁书源能力（官方无 DRM 解密接口）。请求头使用搜索引擎爬虫 UA 以获取 SSR 全量页面（普通 UA 仅返回空壳）。依赖 omnireadMediaType 短剧扩展。",
+  "enabled": true,
+  "concurrentRate": "3/1000",
+  "header": "{\"User-Agent\": \"Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)\", \"Referer\": \"https://hongguoduanju.com\", \"Accept\": \"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\", \"Accept-Language\": \"zh-CN,zh;q=0.9\"}",
+  "jsLib": "function hgSd(h){var p=(h||'').indexOf('_ROUTER_DATA');if(p<0)return null;var s=h.indexOf('{',p),d=0,q=false,e=false,i,c;for(i=s;i<h.length;i++){c=h.charAt(i);if(q){if(e)e=false;else if(c==='\\\\')e=true;else if(c==='\"')q=false;}else{if(c==='\"')q=true;else if(c==='{')d++;else if(c==='}'){d--;if(!d)break;}}}if(d)return null;try{var o=JSON.parse(h.substring(s,i+1));return (((o.loaderData||{}).detail_page||{}).seriesDetail)||null;}catch(x){return null;}}",
+  "searchUrl": "/incent_resource/suggestion?app_id=8662&web_id=1234567890123456789&query={{key}}&count=20",
+  "exploreUrl": "热门榜::/rank/hot-real-drama?page={{page}}\n真人短剧::/category/real-drama?page={{page}}\n漫剧::/category/comic-drama?page={{page}}\nAI剧::/category/ai-drama?page={{page}}\n爱情::/category/real-drama/romance?page={{page}}\n年代::/category/real-drama/period?page={{page}}\n逆袭::/category/real-drama/comeback?page={{page}}\n传奇::/category/real-drama/legend?page={{page}}\n成长::/category/real-drama/growth?page={{page}}\n家庭::/category/real-drama/family?page={{page}}\n家族::/category/real-drama/clan?page={{page}}\n萌宝::/category/real-drama/cute-kids?page={{page}}\n悬疑::/category/real-drama/suspense?page={{page}}\n惊悚::/category/real-drama/thriller?page={{page}}\n恐怖::/category/real-drama/horror?page={{page}}\n志怪::/category/real-drama/supernatural?page={{page}}\n古装::/category/real-drama/costume?page={{page}}\n玄幻::/category/real-drama/fantasy?page={{page}}\n奇幻::/category/real-drama/wonder?page={{page}}\n都市::/category/real-drama/urban?page={{page}}\n青春::/category/real-drama/youth?page={{page}}\n喜剧::/category/real-drama/comedy?page={{page}}\n科幻::/category/real-drama/sci-fi?page={{page}}\n灾难::/category/real-drama/disaster?page={{page}}\n动作冒险::/category/real-drama/action-adventure?page={{page}}\n战争::/category/real-drama/war?page={{page}}\n综艺::/category/real-drama/variety?page={{page}}\n剧情::/category/real-drama/drama?page={{page}}",
+  "ruleSearch": {
+    "bookList": "$.suggest_list[?(@.video_data)]",
+    "name": "$.video_data.series_title",
+    "bookUrl": "@js:(function(){var k=result.keyword||'';var s=(result.video_data||{}).series_id;if(/^\\d{10,}$/.test(k))return 'https://hongguoduanju.com/detail?series_id='+k;return s?('https://hongguoduanju.com/detail?series_id='+s):''})()",
+    "coverUrl": "$.video_data.series_cover",
+    "kind": "$.video_data.episode_right_text",
+    "intro": "$.video_data.series_intro"
+  },
+  "ruleExplore": {
+    "bookList": "@js:(function(){var ms=result.match(/page=(\\d+)/g);var mx=0,i,v;if(ms)for(i=0;i<ms.length;i++){v=parseInt(ms[i].substring(5));if(v>mx)mx=v;}var pg=page||1;if(mx&&pg>mx)return [];var cs=result.match(/<a[^>]+href=\"\\/detail\\?series_id=\\d+\"[^>]*>[\\s\\S]*?<\\/a>/g)||[];var seen={},out=[],h;for(i=0;i<cs.length;i++){h=/series_id=(\\d+)/.exec(cs[i]);if(h&&!seen[h[1]]){seen[h[1]]=1;out.push(cs[i]);}}return out})()",
+    "name": "@js:(function(){return (/alt=\"([^\"]*)\"/.exec(result)||[])[1]||(/class=\"[^\"]*pc-title[^\"]*\"[^>]*>([^<]+)</.exec(result)||[])[1]||'未知作品'})()",
+    "bookUrl": "@js:(function(){return (/href=\"([^\"]+)\"/.exec(result)||[])[1]||''})()",
+    "coverUrl": "@js:(function(){return (/<img[^>]+src=\"([^\"]+)\"/.exec(result)||[])[1]||''})()",
+    "kind": "@js:(function(){return (/class=\"[^\"]*episode[^\"]*\"[^>]*>([^<]+)</.exec(result)||[])[1]||''})()",
+    "intro": "@js:(function(){var ms=result.match(/pc-tag-text[^>]*>([^<]+)</g)||[];var o=[],i;for(i=0;i<ms.length;i++){var v=/>([^<]+)</.exec(ms[i]);if(v)o.push(v[1]);}return o.join(' ')})()"
+  },
+  "ruleBookInfo": {
+    "name": "@js:(function(){var s=hgSd(result)||{};return s.series_name||s.series_title||''})()",
+    "author": "@js:(function(){var s=hgSd(result)||{};var a=s.celebrities||[],o=[],i;for(i=0;i<a.length&&i<6;i++){if(a[i]&&a[i].nickname)o.push(a[i].nickname);}return o.join(' / ')})()",
+    "kind": "@js:(function(){var s=hgSd(result)||{};var k=s.episode_right_text||'';if(s.accessible_episode_cnt>0&&s.episode_cnt>s.accessible_episode_cnt)k+=' · 免费前'+s.accessible_episode_cnt+'集';return k})()",
+    "intro": "@js:(function(){var s=hgSd(result)||{};return s.series_intro||''})()",
+    "coverUrl": "@js:(function(){var s=hgSd(result)||{};return s.series_cover||''})()"
+  },
+  "ruleToc": {
+    "chapterList": "@js:(function(){var s=hgSd(result)||{};var vl=s.vid_list||[];var n=vl.length;if(s.accessible_episode_cnt>0&&s.accessible_episode_cnt<n)n=s.accessible_episode_cnt;var m=/series_id=(\\d+)/.exec(baseUrl||'');var sid=m?m[1]:'';var o=[],i;for(i=0;i<n;i++)o.push('第'+(i+1)+'集\\t'+(sid?('https://hongguoduanju.com/detail?series_id='+sid+'&ep='+vl[i]):''));return o})()",
+    "chapterName": "@js:(function(){return String(result||'').split('\\t')[0]||'正片'})()",
+    "chapterUrl": "@js:(function(){return String(result||'').split('\\t')[1]||''})()"
+  },
+  "ruleContent": {
+    "content": "@js:(function(){var m=/[?&]ep=(\\d+)/.exec(baseUrl||'');if(!m)return '';return JSON.stringify({url:'https://hongguoduanju.com/video/public/'+m[1]+'/360p.mp4',headers:{'User-Agent':'com.phoenix.read/71332','Referer':'https://novel.snssdk.com/'}})})()"
+  }
+}

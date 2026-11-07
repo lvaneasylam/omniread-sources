@@ -1,0 +1,47 @@
+{
+  "bookSourceName": "悦听吧",
+  "bookSourceUrl": "http://www.yuetingba.cn/",
+  "bookSourceType": 1,
+  "bookSourceVersion": "1.0.0",
+  "bookSourceGroup": "有声书",
+  "bookSourceComment": "悦听吧（yuetingba.cn）有声小说站接入。分类/榜单/搜索/多页目录/播放全链路可用。播放走站点公开接口 /api/app/docs-listen/{章ID}/audio-url（纯文本返回带 token 的 mp3 直链，token 每次请求刷新无过期问题；实测直链支持 Range，系统播放器可拖动定位）。长篇目录按每页 200 章自动分页（如庆余年 1865 集=10 页）。端点逆向自站点 ting-player.min.js 混淆脚本，若站点改版需同步更新。",
+  "enabled": true,
+  "concurrentRate": "3/1000",
+  "header": "{\"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36\", \"Referer\": \"http://www.yuetingba.cn/\", \"Accept\": \"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\", \"Accept-Language\": \"zh-CN,zh;q=0.9\"}",
+  "searchUrl": "/search?type=1&name={{key}}",
+  "exploreUrl": "玄幻::/book/1/{{page}}\n都市::/book/4/{{page}}\n历史::/book/2/{{page}}\n名著::/book/6/{{page}}\n女频::/book/7/{{page}}\n科幻::/book/5/{{page}}\n武侠::/book/3/{{page}}\n评书::/book/a/{{page}}\n社科::/book/8/{{page}}\n最新::/top/latest/{{page}}\n推荐::/top/recommend/{{page}}",
+  "ruleSearch": {
+    "bookList": "@css:div.section-box-list-item",
+    "name": "@css:.box-list-item-text-title@text",
+    "bookUrl": "@css:a@href",
+    "coverUrl": "@css:img@src",
+    "author": "@js:(function(){var m=/class=\"box-list-item-text-autspeaker[\\s\\S]*?<span title=\"([^\"]+)\"/.exec(result);return m?m[1]:''})()",
+    "kind": "@js:(function(){var m=/class=\"box-list-item-text-autspeaker[\\s\\S]*?<span title=\"[^\"]+\"[\\s\\S]*?<span title=\"([^\"]+)\"/.exec(result);return m?m[1]:''})()",
+    "intro": "@css:.box-list-item-text-intro@text"
+  },
+  "ruleExplore": {
+    "bookList": "@css:div.section-box-list-item",
+    "name": "@css:.box-list-item-text-title@text",
+    "bookUrl": "@css:a@href",
+    "coverUrl": "@css:img@src",
+    "author": "@js:(function(){var m=/class=\"box-list-item-text-autspeaker[\\s\\S]*?<span title=\"([^\"]+)\"/.exec(result);return m?m[1]:''})()",
+    "kind": "@js:(function(){var m=/class=\"box-list-item-text-autspeaker[\\s\\S]*?<span title=\"[^\"]+\"[\\s\\S]*?<span title=\"([^\"]+)\"/.exec(result);return m?m[1]:''})()",
+    "intro": "@css:.box-list-item-text-intro@text"
+  },
+  "ruleBookInfo": {
+    "name": "@css:h1@text",
+    "author": "@js:(function(){var m=/\"author\":\\s*\\{[^{}]*?\"name\":\\s*\"([^\"]+)\"/.exec(result);return m?m[1]:''})()",
+    "kind": "@js:(function(){var m=/\"byArtist\":\\s*\"([^\"]+)\"/.exec(result);return m?('演播:'+m[1]):''})()",
+    "intro": "@css:meta[name=\"description\"]@content",
+    "coverUrl": "@js:(function(){var m=/src=[\"']([^\"']*myfiles\\/host\\/listen[^\"']+)[\"']/.exec(result);return m?m[1]:''})()"
+  },
+  "ruleToc": {
+    "chapterList": "@js:(function(){var eps=result.match(/<a\\b[^>]*href=\"(\\/book\\/ting\\/[0-9a-f-]{36})\"[^>]*>\\s*([^<][^<]*?)\\s*<\\/a>/g)||[];var seen={},out=[],i,h,m;for(i=0;i<eps.length;i++){m=/href=\"(\\/book\\/ting\\/[0-9a-f-]{36})\"/.exec(eps[i]);h=m?m[1]:'';if(h&&!seen[h]){seen[h]=1;out.push(eps[i]);}}return out})()",
+    "chapterName": "@js:(function(){return (/>([^<>]+)<\\/a>/.exec(result)||[])[1]||'未知章节'})()",
+    "chapterUrl": "@js:(function(){var m=/\\/book\\/ting\\/([0-9a-f-]{36})/.exec(result);return m?('http://www.yuetingba.cn/api/app/docs-listen/'+m[1]+'/audio-url'):''})()",
+    "nextTocUrl": "@js:(function(){var m=/\\/book\\/detail\\/([0-9a-f-]{36})\\/(\\d+)/.exec(baseUrl||'');if(!m)return '';var next=parseInt(m[2])+200;return result.indexOf('/book/detail/'+m[1]+'/'+next)>-1?('http://www.yuetingba.cn/book/detail/'+m[1]+'/'+next):''})()"
+  },
+  "ruleContent": {
+    "content": "@js:(function(){var u=String(result||'').replace(/^[\\s\"']+|[\\s\"']+$/g,'');return /^https?:\\/\\//.test(u)?u:''})()"
+  }
+}
